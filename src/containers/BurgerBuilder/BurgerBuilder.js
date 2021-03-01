@@ -17,13 +17,6 @@ class BurgerBuilder extends Component {
     }
 
     componentDidMount () {
-        // axios.get('https://react-my-burger-710a8-default-rtdb.firebaseio.com/ingredients.json')
-        //     .then(response => {
-        //         this.setState({ ingredients : response.data });
-        //     })
-        //     .catch(error=>{
-        //         this.setState({ error: true })
-        //     });
         this.props.onInitIngredients();
     }
 
@@ -39,7 +32,12 @@ class BurgerBuilder extends Component {
     }
 
     purchaseHandler = () => {
-        this.setState({purchasing: true});
+        if(this.props.isAuthenticated){
+            this.setState({purchasing: true});
+        }
+        else {
+            this.props.history.push('/auth');
+        }
     }
 
     purchaseCancelHandler = () => {
@@ -47,15 +45,6 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-        //alert('Burger will be processed in a moment. Enzuuooooyyy..!!!!');
-
-        // const queryParams = [];
-        // for (let i in this.props.ings){
-        //     queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.props.ings[i]));
-        // }
-
-        // queryParams.push('price='+ this.props.price);
-        // const queryString = queryParams.join('&');
         this.props.onInitPurchase();
         this.props.history.push('/checkout');
     }
@@ -81,7 +70,8 @@ class BurgerBuilder extends Component {
                     disabled={disabledInfo}
                     purchasable={this.updatePurchaseState(this.props.ings)}
                     ordered={this.purchaseHandler}
-                    price={this.props.price}/>
+                    price={this.props.price}
+                    isAuthenticated={this.props.isAuthenticated}/>
                 </Auxiliary>);
             
             orderSummary = <OrderSummary 
@@ -106,7 +96,8 @@ const mapStateToProps = state => {
     return{
         ings: state.burgerBuilder.ingredients,
         price: state.burgerBuilder.totalPrice,
-        error: state.burgerBuilder.error
+        error: state.burgerBuilder.error,
+        isAuthenticated: state.auth.token !== null
     }
 }
 
